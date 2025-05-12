@@ -1,65 +1,66 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
-const { ethers } = require("hardhat");
-const { gen } = require("../utilities/accumulator.js"); 
-const { initBitmap } = require("../utilities/bitmap.js"); 
-
-var bigInt = require("big-integer");
-
-require("@nomiclabs/hardhat-web3");
+﻿const hre = require("hardhat");
 
 async function main() {
-	let capacity = 50;
-	let [n, acc] = gen(); 
-	// when adding bytes to contract, need to concat with "0x"
-	let nHex = "0x" + bigInt(n).toString(16); // convert back to bigInt with bigInt(nHex.slice(2), 16)
-	let accHex = "0x" + bigInt(acc).toString(16); 
+  // Log available contracts
+  const artifactNames = await hre.artifacts.getAllFullyQualifiedNames();
+  console.log("Available contracts:", artifactNames);
+  
+  // Get the contract factories with correct names from contracts list
+  const DID = await hre.ethers.getContractFactory("DID");
+  const Credentials = await hre.ethers.getContractFactory("Credentials");
+  const Accumulator = await hre.ethers.getContractFactory("Accumulator");
+  const IssuerRegistry = await hre.ethers.getContractFactory("IssuerRegistry");
+  const AdminAccounts = await hre.ethers.getContractFactory("AdminAccounts");
+  const SubAccumulator = await hre.ethers.getContractFactory("SubAccumulator");
 
-	// DID Registry contract to deploy 
-	const IdentityRegistry = await ethers.getContractFactory('DID'); 
-	const identityReg = await IdentityRegistry.deploy(); 
-	await identityReg.deployed(); 
-	console.log("DID Registry has been deployed to:", identityReg.address); 
+  // Deploy contracts
+  console.log("Deploying contracts...");
+  
+  const did = await DID.deploy();
+  await did.waitForDeployment();
+  console.log("DID deployed to:", await did.getAddress());
 
-	// Credential registry contract to deploy 
-	const CredentialRegistry = await ethers.getContractFactory('Credentials');
-	const credentialReg = await CredentialRegistry.deploy(); 
-	await credentialReg.deployed();
-	console.log("Credentials Registry has been deployed to:", credentialReg.address); 
+  const credentials = await Credentials.deploy();
+  await credentials.waitForDeployment();
+  console.log("Credentials deployed to:", await credentials.getAddress());
 
-	// admin account registry 
-	const AdminRegistry = await ethers.getContractFactory('AdminAccounts');
-	const adminReg = await AdminRegistry.deploy(); 
-	await adminReg.deployed(); 
-	console.log("Admins Registry has been deployed to:", adminReg.address); 
+  // Deploy AdminAccounts first
+  console.log("Deploying AdminAccounts...");
+  const adminAccounts = await AdminAccounts.deploy();
+  await adminAccounts.waitForDeployment();
+  console.log("AdminAccounts deployed to:", await adminAccounts.getAddress());
 
-	// issuer registry 
-	const IssuerRegistry = await ethers.getContractFactory('IssuerRegistry'); 
-	const issuerReg = await IssuerRegistry.deploy(adminReg.address); 
-	await issuerReg.deployed(); 
-	console.log("Issuers Registry has been deployed to:", issuerReg.address); 
+  // Deploy IssuerRegistry first
+  console.log("Deploying IssuerRegistry...");
+  const issuerRegistry = await IssuerRegistry.deploy(await adminAccounts.getAddress());
+  await issuerRegistry.waitForDeployment();
+  console.log("IssuerRegistry deployed to:", await issuerRegistry.getAddress());
 
-	// // sub-accumulator 
-	const SubAccumulator = await ethers.getContractFactory('SubAccumulator'); 
-	const subAcc = await SubAccumulator.deploy(issuerReg.address);
-	await subAcc.deployed(); 
-	console.log("Sub-Accumulator has been deployed to:", subAcc.address); 
+  // Deploy SubAccumulator with IssuerRegistry address
+  console.log("Deploying SubAccumulator...");
+  const subAccumulator = await SubAccumulator.deploy(await issuerRegistry.getAddress());
+  await subAccumulator.waitForDeployment();
+  console.log("SubAccumulator deployed to:", await subAccumulator.getAddress());
 
-	// calculate how many hash function needed and update in contract
-	await initBitmap(subAcc, capacity); 
+  // Get addresses for other deployments
+  const issuerRegistryAddress = await issuerRegistry.getAddress();
+  const subAccumulatorAddress = await subAccumulator.getAddress();
+  
+  // Initial values for g and n (you might want to adjust these)
+  const g = ethers.toUtf8Bytes("1");  // Example value
+  const n = ethers.toUtf8Bytes("1");  // Example value
 
-	const Accumulator = await ethers.getContractFactory('Accumulator'); 
-	const globAcc = await Accumulator.deploy(issuerReg.address, subAcc.address, accHex, nHex); 
-	await globAcc.deployed();
-	console.log("Global accumulator has been deployed to:", globAcc.address); 
+  // Deploy Accumulator with constructor arguments
+  const accumulator = await Accumulator.deploy(
+    issuerRegistryAddress,
+    subAccumulatorAddress,
+    g,
+    n
+  );
+  await accumulator.waitForDeployment();
+  console.log("Accumulator deployed to:", await accumulator.getAddress());
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
