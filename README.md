@@ -37,3 +37,15 @@ npx hardhat run scripts/deploy.js
 
 ## Code Base 
 - The original CredChain code based was developed by Yue Liu. This is the updated CredChain version to latest Solidity (^0.8.0), utilises new deployment and testing framework (Hardhat and Truffle), includes frontend application and new features (revocation mechanism). 
+
+
+
+# Known Dependencies Issues
+
+## Development Dependencies Warnings
+- glob@7.2.3: Will be updated in future releases
+- npmlog@6.0.2: Development dependency only
+- rimraf@3.0.2: Build script dependency
+- gauge@4.0.4: Part of build toolchain
+
+These warnings don't affect production code or smart contract functionality.
