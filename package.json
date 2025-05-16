@@ -17,12 +17,22 @@
     "hardhat-deploy": "^1.0.2"
   },
   "dependencies": {
-    "big-integer": "^1.6.51",
+    "better-sqlite3": "^11.10.0",
+    "big-integer": "^1.6.52",
     "crypto-js": "^4.1.1",
     "ethereumjs-util": "^7.1.5",
+    "ethers": "^6.14.1",
+    "express-async-handler": "^1.2.0",
+    "express-validator": "^7.2.1",
     "reflect-metadata": "^0.2.2",
     "sqlite3": "^5.1.7",
     "typeorm": "^0.3.23",
     "web3": "^1.10.0"
+  },
+  "resolutions": {
+    "elliptic": "^6.6.0",
+    "axios": "^1.6.0",
+    "ws": "^8.0.0",
+    "tough-cookie": "^4.1.3"
   }
 }
