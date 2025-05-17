@@ -11,7 +11,7 @@
     "todo-security": "echo 'Address remaining dependencies before production'"
   },
   "dependencies": {
-    "better-sqlite3": "11.10.0",
+    "better-sqlite3": "^11.10.0",
     "big-integer": "1.6.52",
     "crypto-js": "4.2.0",
     "ethereumjs-util": "7.1.5",
