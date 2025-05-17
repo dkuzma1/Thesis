@@ -4,27 +4,52 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "@nomiclabs/hardhat-truffle5": "^2.0.7",
-    "@truffle/contract": "^4.6.31",
-    "hardhat": "^2.24.0",
-    "hardhat-deploy": "^1.0.2"
+    "test": "npx hardhat test",
+    "security-check": "npm audit --production",
+    "update-safe": "npm audit fix",
+    "update-all": "npm audit fix --force",
+    "todo-security": "echo 'Address remaining dependencies before production'"
   },
   "dependencies": {
-    "better-sqlite3": "^11.10.0",
-    "big-integer": "^1.6.52",
-    "crypto-js": "^4.1.1",
-    "ethereumjs-util": "^7.1.5",
-    "ethers": "^6.14.1",
-    "reflect-metadata": "^0.2.2",
-    "sqlite3": "^5.1.7",
-    "typeorm": "^0.3.23",
-    "web3": "^4.16.0"
+    "better-sqlite3": "11.10.0",
+    "big-integer": "1.6.52",
+    "crypto-js": "4.2.0",
+    "ethereumjs-util": "7.1.5",
+    "ethers": "6.14.1",
+    "reflect-metadata": "0.2.2",
+    "sqlite3": "5.1.7",
+    "typeorm": "0.3.23",
+    "web3": "1.10.4"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "5.0.0",
+    "@nomiclabs/hardhat-truffle5": "2.0.7",
+    "@nomiclabs/hardhat-web3": "2.0.0",
+    "@truffle/contract": "4.6.31",
+    "hardhat": "2.24.0",
+    "hardhat-deploy": "1.0.2"
+  },
+  "resolutions": {
+    "crypto-js": "4.2.0",
+    "elliptic": "6.5.4",
+    "tough-cookie": "4.1.3",
+    "ws": "8.16.0",
+    "tar": "6.2.1",
+    "request": "2.88.2",
+    "web3-bzz": "1.10.4",
+    "eth-lib": "0.1.29",
+    "swarm-js": "0.1.40",
+    "**/request": "2.88.2",
+    "**/ws": "8.16.0",
+    "**/tough-cookie": "4.1.3",
+    "**/tar": "6.2.1",
+    "servify": "0.3.1"
+  },
+  "overrides": {
+    "web3": "1.10.4",
+    "web3-bzz": "1.10.4"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
