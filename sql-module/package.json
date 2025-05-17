@@ -1,0 +1,14 @@
+{
+  "name": "sql-module",
+  "version": "1.0.0",
+  "description": "SQL optimization module for Schumm's credential revocation architecture",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "better-sqlite3": "^8.4.0",
+    "big-integer": "^1.6.51"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
