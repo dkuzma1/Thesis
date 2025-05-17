@@ -1,13 +1,9 @@
 const path = require('path');
 
-// Try to show any module loading errors
 try {
   console.log('Attempting to load database module...');
-  const dbModule = require('./database');
-  console.log('Database module loaded successfully:', Object.keys(dbModule));
+  const { initDatabase, closeDatabase } = require('./database');
   
-  const { initDatabase, closeDatabase } = dbModule;
-
   // Test database functionality
   console.log('Testing database module...');
   
