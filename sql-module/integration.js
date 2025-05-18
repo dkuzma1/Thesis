@@ -89,8 +89,8 @@ function integrateWithCredentialRevocation(originalSystem, options = {}) {
         const revocationData = {
           credential_id: credentialId,
           issuer_id: issuerId,
-          epoch_id: originalResult.epochId || 0,
-          prime_value: originalResult.primeValue || ''
+          epoch_id: originalResult && originalResult.epochId ? originalResult.epochId : 1,
+          prime_value: originalResult && originalResult.primeValue ? originalResult.primeValue : credentialId
         };
         
         sqlModule.recordRevocation(revocationData);
