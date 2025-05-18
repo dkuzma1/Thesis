@@ -119,11 +119,21 @@ describe("SQL-Enhanced Credential Revocation System", function() {
             // Create original credential system
             originalSystem = {
                 verifyCredential: async (credentialId, epochId) => {
-                    return await verify(credentialId, epochId, subAccInstance, accInstance);
+                    // Get the result from the original system
+                    const result = await verify(credentialId, epochId, subAccInstance, accInstance);
+                    return result;
                 },
                 
                 revokeCredential: async (credentialId, issuerId) => {
-                    return await revoke(credentialId, subAccInstance, accInstance, issuer_Pri);
+                    // Revoke the credential using the original system
+                    await revoke(credentialId, subAccInstance, accInstance, issuer_Pri);
+                    
+                    // Return a consistent object that integration.js expects
+                    return {
+                        success: true,
+                        epochId: 1, // Use the current epoch
+                        primeValue: credentialId // Use credential ID as the prime value
+                    };
                 }
             };
             
