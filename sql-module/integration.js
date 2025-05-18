@@ -36,7 +36,7 @@ function integrateWithCredentialRevocation(originalSystem, options = {}) {
         );
         
         // Extract bloom filter result from original verification
-        const bloomFilterResult = !originalResult.valid;
+        const bloomFilterResult = !originalResult;
         
         // Try to optimize using SQL
         const sqlResult = sqlModule.verifyCredential(
@@ -118,51 +118,67 @@ function integrateWithCredentialRevocation(originalSystem, options = {}) {
      */
     batchVerifyCredentials: async function(credentials) {
       try {
-        // First get bloom filter results for all credentials
         const results = {};
         const credentialsWithBloomResults = [];
         
-        // Process in batches to avoid overloading the system
-        const batchSize = 50;
-        for (let i = 0; i < credentials.length; i += batchSize) {
-          const batch = credentials.slice(i, i + batchSize);
+        // First, run original verification to get bloom filter results
+        for (const cred of credentials) {
+          const originalResult = await originalVerifyCredential.call(
+            originalSystem,
+            cred.id,
+            cred.epoch
+          );
           
-          // Get bloom filter results for the batch
-          await Promise.all(batch.map(async (cred) => {
-            try {
-              const originalResult = await originalVerifyCredential.call(
-                originalSystem,
-                cred.id,
-                cred.epoch
-              );
-              
-              // Extract bloom filter result
-              const bloomResult = !originalResult.valid;
-              
-              credentialsWithBloomResults.push({
-                ...cred,
-                bloomResult
-              });
-            } catch (error) {
-              console.error(`Error checking bloom filter for credential ${cred.id}:`, error);
-              // Don't add to the batch if we couldn't get a bloom filter result
-            }
-          }));
+          // Extract bloom filter result
+          const bloomResult = !originalResult;
+          
+          credentialsWithBloomResults.push({
+            ...cred,
+            bloomResult,
+            originalResult // Keep track of original result for comparison
+          });
         }
         
-        // Now optimize with SQL
+        // Use SQL batch optimization
         const sqlResults = sqlModule.batchVerifyCredentials(credentialsWithBloomResults);
         
         if (sqlResults !== null) {
-          // Add optimization flag
-          Object.keys(sqlResults).forEach(credId => {
-            sqlResults[credId].optimized = true;
-          });
+          // Process SQL results, but ensure they match original results
+          for (const cred of credentialsWithBloomResults) {
+            const sqlResult = sqlResults[cred.id];
+            
+            // Check for discrepancy
+            if (sqlResult && cred.originalResult !== sqlResult.valid) {
+              console.log(`Batch verification discrepancy for ${cred.id.substring(0, 8)}:`, 
+                        `Original: ${cred.originalResult}, SQL: ${sqlResult.valid}`);
+              
+              // Use original result when discrepancy exists
+              results[cred.id] = {
+                valid: cred.originalResult,
+                method: `${sqlResult.method}-discrepancy`,
+                optimized: true,
+                discrepancy: true
+              };
+            } else if (sqlResult) {
+              // Results match, use SQL result
+              results[cred.id] = {
+                ...sqlResult,
+                optimized: true
+              };
+            } else {
+              // SQL didn't return a result for this credential
+              results[cred.id] = {
+                valid: cred.originalResult,
+                method: 'original-fallback',
+                optimized: false
+              };
+            }
+          }
           
-          return sqlResults;
+          return results;
         }
         
-        // Fall back to non-batch verification if SQL batch failed
+        // Fallback: If SQL batch fails, use individual verification
         for (const cred of credentials) {
           results[cred.id] = await this.verifyCredential(cred.id, cred.epoch);
         }
@@ -171,7 +187,7 @@ function integrateWithCredentialRevocation(originalSystem, options = {}) {
       } catch (error) {
         console.error('Error in batch verification:', error);
         
-        // Fall back to non-batch verification
+        // Final fallback to individual verification
         const results = {};
         for (const cred of credentials) {
           results[cred.id] = await this.verifyCredential(cred.id, cred.epoch);

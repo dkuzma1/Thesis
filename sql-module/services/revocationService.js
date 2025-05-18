@@ -11,9 +11,15 @@ class RevocationService {
    //Prepare SQL statements for better performance
    */
   prepareStatements() {
+    
     this.insertRevocation = this.db.prepare(`
       INSERT INTO DefinitiveRevocations (credential_id, epoch_id, issuer_id, prime_value)
       VALUES (?, ?, ?, ?)
+      ON CONFLICT(credential_id) DO UPDATE SET
+        revocation_time = CURRENT_TIMESTAMP,
+        epoch_id = excluded.epoch_id,
+        issuer_id = excluded.issuer_id,
+        prime_value = excluded.prime_value
     `);
     
     this.createRevocationBatch = this.db.prepare(`
