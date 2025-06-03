@@ -1,5 +1,5 @@
-const SQLModule = require('./index');  // Changed from './sql-module'
-const { integrateWithCredentialRevocation } = require('./integration');  // Changed from './sql-module/integration'
+const SQLModule = require('../index');  // Changed from './sql-module'
+const { integrateWithCredentialRevocation } = require('../integration');  // Changed from './sql-module/integration'
 
 async function testSQLIntegration() {
   try {

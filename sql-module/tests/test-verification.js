@@ -1,6 +1,6 @@
 const path = require('path');
-const { initDatabase, closeDatabase } = require('./database');
-const VerificationService = require('./services/verificationService');
+const { initDatabase, closeDatabase } = require('../database');
+const VerificationService = require('../services/verificationService');
 
 async function testVerificationService() {
   try {

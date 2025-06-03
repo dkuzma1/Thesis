@@ -1,6 +1,6 @@
 const path = require('path');
-const { initDatabase, closeDatabase } = require('./database');
-const RevocationService = require('./services/revocationService');
+const { initDatabase, closeDatabase } = require('../database');
+const RevocationService = require('../services/revocationService');
 
 async function testRevocationService() {
   try {

@@ -2,7 +2,7 @@ const path = require('path');
 
 try {
   console.log('Attempting to load database module...');
-  const { initDatabase, closeDatabase } = require('./database');
+  const { initDatabase, closeDatabase } = require('../database');
   
   // Test database functionality
   console.log('Testing database module...');

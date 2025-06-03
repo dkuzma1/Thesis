@@ -1,4 +1,4 @@
-const { integrateWithCredentialRevocation } = require('./integration');
+const { integrateWithCredentialRevocation } = require('../integration');
 
 // Mock of Schumm's original credential revocation system
 const mockOriginalSystem = {

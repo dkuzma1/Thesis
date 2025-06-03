@@ -5,7 +5,7 @@ console.log('Starting simple verification test...');
 try {
   // Step 1: Load the database module
   console.log('1. Loading database module...');
-  const { initDatabase, closeDatabase } = require('./database');
+  const { initDatabase, closeDatabase } = require('../database');
   console.log('   Database module loaded successfully');
   
   // Step 2: Initialize the database
@@ -16,7 +16,7 @@ try {
   
   // Step 3: Try to load the BloomGuard utility
   console.log('3. Loading BloomGuard utility...');
-  const BloomGuard = require('./utils/bloomGuard');
+  const BloomGuard = require('../utils/bloomGuard');
   console.log('   BloomGuard loaded successfully');
   
   // Step 4: Create an instance of BloomGuard
@@ -26,7 +26,7 @@ try {
   
   // Step 5: Try to load the VerificationService
   console.log('5. Loading VerificationService...');
-  const VerificationService = require('./services/verificationService');
+  const VerificationService = require('../services/verificationService');
   console.log('   VerificationService loaded successfully');
   
   // Step 6: Create an instance of VerificationService
